@@ -1,6 +1,6 @@
 #pragma once
 /**
- * Priority for a SoundResource of a Mixer::Handle.
+ * Priority for a SoundResource or a Mixer::Handle.
  * Used to decide if playing a sound should stop another
  * sound when the mixer is full.
  */
