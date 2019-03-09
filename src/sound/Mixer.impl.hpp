@@ -28,7 +28,8 @@ void Mixer<Channels_N>::update()
         [](const Handle& lhs, const Handle& rhs) {
             if (lhs.priority == rhs.priority)
                 return lhs.counter < rhs.counter;
-            return lhs.priority < rhs.priority;
+            else
+                return lhs.priority < rhs.priority;
     });
 }
 
@@ -38,21 +39,7 @@ template <std::size_t Channels_N>
 void Mixer<Channels_N>::play(const sf::SoundBuffer& buffer, SoundPriority priority)
 {
     ++mCounter;
-
-    // Find a handle with less priority than the sound we want to play,
-    // set the buffer to it and play.
-    for (auto& handle : mHandles) {
-        if (handle.priority <= priority) {
-            // play
-            handle.sound->setBuffer(buffer);
-            handle.sound->play();
-            // update
-            handle.priority = priority;
-            handle.counter = mCounter;
-            break;
-        }
-    }
-
+    this->_playBuffer(buffer, priority);
 }
 
 
@@ -61,19 +48,7 @@ template <std::size_t Channels_N>
 void Mixer<Channels_N>::play(const SoundResource& resource, SoundPriority priority)
 {
     ++mCounter;
-
-    // Find a handle with less priority than the sound we want to play,
-    // set the buffer to it and play.
-    for (auto& handle : mHandles) {
-        if (handle.priority <= priority) {
-            handle.sound->setBuffer(resource.buffer);
-            handle.sound->play();
-            handle.priority = priority;
-            handle.counter = mCounter;
-            break;
-        }
-    }
-
+    this->_playBuffer(resource.buffer, priority);
 }
 
 
@@ -82,17 +57,30 @@ template <std::size_t Channels_N>
 void Mixer<Channels_N>::play(const SoundResource& resource)
 {
     ++mCounter;
+    this->_playBuffer(resource.buffer, resource.priority);
+}
 
-    // Find a handle with less priority than the sound we want to play,
-    // set the buffer to it and play.
+
+
+/**
+ * Private core method to play sounds.
+ */
+template <std::size_t Channels_N>
+inline void Mixer<Channels_N>::_playBuffer(
+    const sf::SoundBuffer& buffer,
+    const SoundPriority& priority
+) noexcept {
+    // Find a handle with less or equal priority than the sound
+    // we want to play, give it the buffer and play it.
     for (auto& handle : mHandles) {
-        if (handle.priority <= resource.priority) {
-            handle.sound->setBuffer(resource.buffer);
+        if (handle.priority <= priority) {
+            // play buffer
+            handle.sound->setBuffer(buffer);
             handle.sound->play();
-            handle.priority = resource.priority;
+            // update handle
+            handle.priority = priority;
             handle.counter = mCounter;
             break;
         }
     }
-
 }

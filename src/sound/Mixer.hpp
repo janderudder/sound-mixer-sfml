@@ -21,6 +21,7 @@ struct Mixer final
 {
     using counter_t = unsigned short;
 
+
     //* Handle type to wrap the sounds
     struct Handle {
         sf::Sound*      sound;
@@ -38,14 +39,25 @@ struct Mixer final
 public:
     explicit Mixer() noexcept;
 
-    // Sorts the handle array. Good to call each frame.
+    // Sorts the handle array. Supposed to be called each frame.
     void update();
 
+    // Play a sf::SoundBuffer, which doesn't know about priority
     void play(const sf::SoundBuffer&, SoundPriority = SoundPriority::NORMAL);
+
+    // Play a SoundResource with a custom priority
     void play(const SoundResource&, SoundPriority);
+
+    // Play a SoundResource with its built-in priority
     void play(const SoundResource&);
+
+
+private:
+    // Called only from other methods (this is the core method that plays a sound)
+    inline void _playBuffer(const sf::SoundBuffer&, const SoundPriority&) noexcept;
+
 
 };
 
-
+// Implementation file:
 #include "./Mixer.impl.hpp"
