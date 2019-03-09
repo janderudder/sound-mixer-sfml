@@ -17,7 +17,7 @@
  * priority.
  */
 template <std::size_t Channels_N>
-struct Mixer final
+class Mixer final
 {
     using counter_t = unsigned short;
 
